@@ -8,6 +8,15 @@
         Width="525"
         Height="350"
         mc:Ignorable="d">
+    <Window.CommandBindings>
+        <CommandBinding Command="Open" Executed="OpenCommand_Executed" />
+        <CommandBinding CanExecute="SaveCommand_CanExecuted"
+                        Command="Save"
+                        Executed="SaveCommand_Executed" />
+        <CommandBinding CanExecute="CloseWindow_CanExecuted"
+                        Command="Close"
+                        Executed="CloseWindow_Executed" />
+    </Window.CommandBindings>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -43,6 +52,15 @@
             <ListViewItem>
                 <Label Content="Ivanov" />
             </ListViewItem>
+            <ListView.ContextMenu>
+                <ContextMenu>
+                    <ContextMenu.Items>
+                        <MenuItem Header="Add" />
+                        <MenuItem Header="Edit" />
+                        <MenuItem Header="Remove" />
+                    </ContextMenu.Items>
+                </ContextMenu>
+            </ListView.ContextMenu>
         </ListView>
 
         <WrapPanel Grid.Row="2">
