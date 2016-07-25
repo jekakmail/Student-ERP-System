@@ -7,16 +7,52 @@
         Title="Student ERP"
         Width="525"
         Height="350"
+        DataContext="{Binding RelativeSource={RelativeSource Self}}"
         mc:Ignorable="d">
     <Window.CommandBindings>
         <CommandBinding Command="Open" Executed="OpenCommand_Executed" />
         <CommandBinding CanExecute="SaveCommand_CanExecuted"
                         Command="Save"
                         Executed="SaveCommand_Executed" />
-        <CommandBinding CanExecute="CloseWindow_CanExecuted"
-                        Command="Close"
-                        Executed="CloseWindow_Executed" />
+        <CommandBinding CanExecute="SaveAsCommand_CanExecuted"
+                        Command="SaveAs"
+                        Executed="SaveAsCommand_Executed" />
+        <CommandBinding CanExecute="DeleteCommand_CanExecuted"
+                        Command="{x:Static local:CommandsProject.RemoveCommand}"
+                        Executed="DeleteCommand_Executed" />
+        <CommandBinding CanExecute="EditCommand_CanExecuted"
+                        Command="{x:Static local:CommandsProject.EditCommand}"
+                        Executed="EditCommand_Executed" />
+        <CommandBinding Command="{x:Static local:CommandsProject.CloseCommand}" Executed="ExitCommand_Executed" />
+        <CommandBinding Command="{x:Static local:CommandsProject.AddCommand}" Executed="AddCommand_Executed" />
+        <CommandBinding Command="{x:Static local:CommandsProject.AboutCommand}" Executed="AboutCommand_Executed" />
     </Window.CommandBindings>
+    <Window.Resources>
+        <local:IntToStringConverter x:Key="GenderConverter" />
+        <Style TargetType="{x:Type ListBoxItem}">
+            <Style.Triggers>
+                <Trigger Property="ItemsControl.AlternationIndex" Value="0">
+                    <Setter Property="Background" Value="#19f39611" />
+                </Trigger>
+                <Trigger Property="ItemsControl.AlternationIndex" Value="1">
+                    <Setter Property="Background" Value="#19000000" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style BasedOn="{StaticResource {x:Type ListBox}}" TargetType="ListBox">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding RelativeSource={x:Static RelativeSource.Self}, Path=Items.Count}" Value="0">
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate>
+                                <TextBlock>Нет элементов для отображения</TextBlock>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -24,65 +60,89 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
+
         <Menu Grid.Row="0">
-            <MenuItem Header="File">
-                <MenuItem Command="Open" Header="Open" />
-                <MenuItem Command="Save" Header="Save" />
-                <MenuItem Command="SaveAs" Header="Save as" />
+            <MenuItem Header="Файл">
+                <MenuItem Command="Open" Header="Открыть" />
+                <MenuItem Command="Save" Header="Сохранить" />
+                <MenuItem Command="SaveAs" Header="Сохранить как" />
                 <Separator />
-                <MenuItem Command="Close" Header="Exit" />
+                <MenuItem Command="{x:Static local:CommandsProject.CloseCommand}" Header="Выход" />
             </MenuItem>
-            <MenuItem Header="Edit">
-                <MenuItem Header="Add" />
-                <MenuItem Header="Edit" />
-                <MenuItem Header="Remove" />
+            <MenuItem Header="Правка">
+                <MenuItem Command="{x:Static local:CommandsProject.AddCommand}" Header="Добавить" />
+                <MenuItem Command="{x:Static local:CommandsProject.EditCommand}" Header="Изменить" />
+                <MenuItem Command="{x:Static local:CommandsProject.RemoveCommand}" Header="Удалить" />
             </MenuItem>
-            <MenuItem Header="Help">
-                <MenuItem Header="About" />
+            <MenuItem Header="Помощь">
+                <MenuItem Command="{x:Static local:CommandsProject.AboutCommand}" Header="О программе" />
             </MenuItem>
         </Menu>
-
-        <ListView Grid.Row="1" Margin="10">
-            <ListViewItem>
-                <Label Content="Petrov" />
-            </ListViewItem>
-            <ListViewItem>
-                <Label Content="Alekseev" />
-            </ListViewItem>
-            <ListViewItem>
-                <Label Content="Ivanov" />
-            </ListViewItem>
-            <ListView.ContextMenu>
+        <ListBox Name="LbStudents"
+                 Grid.Row="1"
+                 Margin="10"
+                 AlternationCount="2"
+                 ItemsSource="{Binding Data.Items}"
+                 SelectionMode="Extended">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <TextBlock Grid.Row="0">
+                            <TextBlock.Text>
+                                <MultiBinding StringFormat="{}{0} {1}">
+                                    <Binding Path="FirstName" />
+                                    <Binding Path="Last" />
+                                </MultiBinding>
+                            </TextBlock.Text>
+                        </TextBlock>
+                        <StackPanel Grid.Row="1" Orientation="Horizontal">
+                            <TextBlock Margin="10 0" Text="{Binding Age, StringFormat={}{0} лет}" />
+                            <TextBlock Text="{Binding Gender, Converter={StaticResource GenderConverter}, StringFormat=Пол: {0}}" />
+                        </StackPanel>
+                    </Grid>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+            <ListBox.ContextMenu>
                 <ContextMenu>
                     <ContextMenu.Items>
-                        <MenuItem Header="Add" />
-                        <MenuItem Header="Edit" />
-                        <MenuItem Header="Remove" />
+                        <MenuItem Command="{x:Static local:CommandsProject.AddCommand}" Header="Добавить" />
+                        <MenuItem Command="{x:Static local:CommandsProject.EditCommand}" Header="Изменить" />
+                        <MenuItem Command="{x:Static local:CommandsProject.RemoveCommand}" Header="Удалить" />
                     </ContextMenu.Items>
                 </ContextMenu>
-            </ListView.ContextMenu>
-        </ListView>
+            </ListBox.ContextMenu>
+        </ListBox>
 
         <WrapPanel Grid.Row="2">
             <Button x:Name="AddBtn"
                     Width="70"
                     MinWidth="50px"
                     Margin="10 0 10 10"
+                    Command="{x:Static local:CommandsProject.AddCommand}"
                     Content="Add" />
             <Button x:Name="EditBtn"
                     Width="70"
                     MinWidth="50px"
                     Margin="10 0 10 10"
+                    Command="{x:Static local:CommandsProject.EditCommand}"
                     Content="Edit" />
             <Button x:Name="RemoveBtn"
                     Width="70"
                     MinWidth="50px"
                     Margin="10 0 10 10"
+                    Command="{x:Static local:CommandsProject.RemoveCommand}"
                     Content="Remove" />
         </WrapPanel>
 
         <StatusBar Grid.Row="3">
-            <StatusBarItem Margin="10 0" Content="Selected 0 field" />
+            <StatusBarItem Margin="10 0"
+                           Content="{Binding ElementName=LbStudents,
+                                             Path=SelectedItems.Count}"
+                           ContentStringFormat="Selected {0} field" />
         </StatusBar>
     </Grid>
 </Window>

@@ -1,0 +1,147 @@
+﻿<Window x:Class="Student_ERP.AddEditWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:local="clr-namespace:Student_ERP"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        Title="AddEditWindow"
+        Width="300"
+        Height="216.528"
+        DataContext="{Binding RelativeSource={RelativeSource Self}}"
+        ResizeMode="NoResize"
+        mc:Ignorable="d">
+    <Window.CommandBindings>
+        <CommandBinding CanExecute="SaveCommand_CanExecuted"
+                        Command="Save"
+                        Executed="SaveCommand_OnExecuted" />
+    </Window.CommandBindings>
+    <Window.Resources>
+        <ControlTemplate x:Key="validationFailed">
+            <StackPanel Orientation="Horizontal">
+                <Border BorderBrush="Violet" BorderThickness="2">
+                    <AdornedElementPlaceholder />
+                </Border>
+                <TextBlock FontSize="26"
+                           FontWeight="Bold"
+                           Foreground="Red">
+                    !
+                </TextBlock>
+            </StackPanel>
+        </ControlTemplate>
+        <local:EnumBooleanConverter x:Key="GenderEnumConverter" />
+        <Style TargetType="TextBox">
+            <Style.Triggers>
+                <Trigger Property="Validation.HasError" Value="True">
+                    <Setter Property="ToolTip" Value="{Binding RelativeSource={RelativeSource Self}, Path=(Validation.Errors)[0].ErrorContent}" />
+                    <Setter Property="Foreground" Value="Red" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+    <Grid Margin="10">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="101*" />
+            <ColumnDefinition Width="191*" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Label Grid.Row="0"
+               Grid.Column="0"
+               Content="Имя" />
+        <TextBox x:Name="TbFn"
+                 Grid.Row="0"
+                 Grid.Column="1"
+                 Validation.ErrorTemplate="{StaticResource validationFailed}">
+            <TextBox.Text>
+                <Binding Mode="TwoWay"
+                         NotifyOnValidationError="True"
+                         Path="StudentObj.FirstName"
+                         UpdateSourceTrigger="LostFocus">
+                    <Binding.ValidationRules>
+                        <DataErrorValidationRule />
+                    </Binding.ValidationRules>
+                </Binding>
+            </TextBox.Text>
+        </TextBox>
+        <Label Grid.Row="2"
+               Grid.Column="0"
+               Content="Фамилия" />
+        <TextBox x:Name="TbLn"
+                 Grid.Row="2"
+                 Grid.Column="1"
+                 Validation.ErrorTemplate="{StaticResource validationFailed}">
+            <TextBox.Text>
+                <Binding Mode="TwoWay"
+                         NotifyOnValidationError="True"
+                         Path="StudentObj.Last"
+                         UpdateSourceTrigger="LostFocus">
+                    <Binding.ValidationRules>
+                        <DataErrorValidationRule />
+                    </Binding.ValidationRules>
+                </Binding>
+            </TextBox.Text>
+        </TextBox>
+        <Label Grid.Row="4"
+               Grid.Column="0"
+               Content="Возраст" />
+        <TextBox x:Name="TbAge"
+                 Grid.Row="4"
+                 Grid.Column="1"
+                 Validation.ErrorTemplate="{StaticResource validationFailed}">
+            <TextBox.Text>
+                <Binding Mode="TwoWay"
+                         NotifyOnValidationError="True"
+                         Path="StudentObj.Age"
+                         UpdateSourceTrigger="LostFocus">
+                    <Binding.ValidationRules>
+                        <DataErrorValidationRule />
+                    </Binding.ValidationRules>
+                </Binding>
+            </TextBox.Text>
+        </TextBox>
+        <Label Grid.Row="6"
+               Grid.Column="0"
+               Content="Пол" />
+        <StackPanel Grid.Row="6"
+                    Grid.Column="1"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Orientation="Horizontal">
+            <RadioButton Margin="20 0"
+                         Content="Муж"
+                         GroupName="Group1"
+                         IsChecked="{Binding SelectedRadioButton,
+                                             Converter={StaticResource GenderEnumConverter},
+                                             ConverterParameter=Male,
+                                             Mode=TwoWay}" />
+            <RadioButton Margin="20 0"
+                         Content="Жен"
+                         GroupName="Group1"
+                         IsChecked="{Binding SelectedRadioButton,
+                                             Converter={StaticResource GenderEnumConverter},
+                                             ConverterParameter=Female,
+                                             Mode=TwoWay}" />
+        </StackPanel>
+        <StackPanel Grid.Row="7"
+                    Grid.Column="0"
+                    Grid.ColumnSpan="2"
+                    HorizontalAlignment="Right"
+                    Orientation="Horizontal">
+            <Button Margin="0 5 5 0"
+                    Command="Save"
+                    Content="Сохранить" />
+            <Button Margin="5 5 0 0"
+                    Click="CancelBtn_Click"
+                    Content="Отменить"
+                    IsCancel="True" />
+        </StackPanel>
+    </Grid>
+</Window>
